@@ -17,17 +17,12 @@ class ViewController: UIViewController {
   var deltaColor: CGFloat = 0
 
   // MARK: - Constants
-  let repeatLength: CGFloat = 250
-  let strokeWidth: CGFloat = 20
+  let repeatLength: CGFloat = 1000
+  let minimumStrokeWidth: CGFloat = 10
+  let maximumStrokeWidth: CGFloat = 100
   let colors: [UIColor] = [.cyan, .blue, .purple, .magenta, .red, .orange, .yellow]
 
   // MARK: - UIViewController
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    let recognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
-    recognizer.minimumPressDuration = 0
-    view.addGestureRecognizer(recognizer)
-  }
 
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
@@ -39,7 +34,51 @@ class ViewController: UIViewController {
     guard motion == .motionShake else {
       return
     }
-    view.layer.contents = nil
+    UIView.animate(withDuration: 0.25, animations: {
+      self.view.alpha = 0
+    }, completion: { _ in
+      self.view.layer.contents = nil
+      self.view.alpha = 1
+    })
+
+  }
+
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard let location = touches.first?.location(in: view) else {
+      return
+    }
+    previousPoint = location
+  }
+
+  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard let touch = touches.first else {
+      return
+    }
+    let strokeWidth: CGFloat
+    if view.traitCollection.forceTouchCapability == .available {
+      strokeWidth = minimumStrokeWidth.lerp(to: maximumStrokeWidth, alpha: touch.force / touch.maximumPossibleForce)
+    } else {
+      strokeWidth = minimumStrokeWidth * 2
+    }
+    let point = touch.location(in: view)
+    let distance = hypot(point.x - previousPoint.x, point.y - previousPoint.y)
+    deltaColor = CGFloat(fmod(Double(deltaColor + distance), Double(repeatLength)))
+    let color = colorFor(proportion: deltaColor / repeatLength)
+    let dirtyRect = 
+    let image = imageRenderer.image { imageContext in
+      let context = imageContext.cgContext
+      self.view.layer.render(in: context)
+      let path = CGMutablePath()
+      path.move(to: previousPoint)
+      path.addLine(to: point)
+      context.addPath(path)
+      context.setLineWidth(strokeWidth)
+      context.setLineCap(.round)
+      color.setStroke()
+      context.strokePath()
+    }
+    view.layer.contents = image.cgImage
+    previousPoint = point
   }
 
   // MARK: Instance Methods
@@ -49,35 +88,6 @@ class ViewController: UIViewController {
     let upperIndex = (lowerIndex + 1) % colors.count
     let remainder = proportion * count - CGFloat(lowerIndex)
     return colors[lowerIndex].mix(with: colors[upperIndex], proportion: remainder)
-  }
-
-  @objc private func longPress(_ recognizer: UILongPressGestureRecognizer) {
-    switch recognizer.state {
-    case .began:
-      previousPoint = recognizer.location(in: self.view)
-    case .changed:
-      let point = recognizer.location(in: self.view)
-      let distance = hypot(point.x - previousPoint.x, point.y - previousPoint.y)
-      deltaColor = CGFloat(fmod(Double(deltaColor + distance), Double(repeatLength)))
-      let color = colorFor(proportion: deltaColor / repeatLength)
-      let image = imageRenderer.image { imageContext in
-        let context = imageContext.cgContext
-        self.view.layer.render(in: context)
-        let path = CGMutablePath()
-        path.move(to: previousPoint)
-        path.addLine(to: point)
-        context.addPath(path)
-        context.setLineWidth(strokeWidth)
-        context.setLineCap(.round)
-        color.setStroke()
-        context.strokePath()
-      }
-      view.layer.contents = image.cgImage
-      previousPoint = point
-    default:
-      return
-    }
-
   }
 
 }
