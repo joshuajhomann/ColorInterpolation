@@ -9,13 +9,19 @@
 import UIKit
 
 class ViewController: UIViewController {
+
+  // MARK: - Variables
   var imageRenderer: UIGraphicsImageRenderer!
   var previousPoint: CGPoint = .zero
   var colorIndex = 0
   var deltaColor: CGFloat = 0
+
+  // MARK: - Constants
   let repeatLength: CGFloat = 250
+  let strokeWidth: CGFloat = 20
   let colors: [UIColor] = [.cyan, .blue, .purple, .magenta, .red, .orange, .yellow]
 
+  // MARK: - UIViewController
   override func viewDidLoad() {
     super.viewDidLoad()
     let recognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
@@ -26,9 +32,18 @@ class ViewController: UIViewController {
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     imageRenderer = UIGraphicsImageRenderer(bounds: view.bounds)
+    view.layer.contents = nil
   }
 
-  func colorFor(proportion: CGFloat) -> UIColor {
+  override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+    guard motion == .motionShake else {
+      return
+    }
+    view.layer.contents = nil
+  }
+
+  // MARK: Instance Methods
+  private func colorFor(proportion: CGFloat) -> UIColor {
     let count = CGFloat(colors.count)
     let lowerIndex = Int(proportion * count)
     let upperIndex = (lowerIndex + 1) % colors.count
@@ -36,7 +51,7 @@ class ViewController: UIViewController {
     return colors[lowerIndex].mix(with: colors[upperIndex], proportion: remainder)
   }
 
-  @objc func longPress(_ recognizer: UILongPressGestureRecognizer) {
+  @objc private func longPress(_ recognizer: UILongPressGestureRecognizer) {
     switch recognizer.state {
     case .began:
       previousPoint = recognizer.location(in: self.view)
@@ -48,17 +63,17 @@ class ViewController: UIViewController {
       let image = imageRenderer.image { imageContext in
         let context = imageContext.cgContext
         self.view.layer.render(in: context)
-        color.setStroke()
         let path = CGMutablePath()
         path.move(to: previousPoint)
         path.addLine(to: point)
         context.addPath(path)
-        context.setLineWidth(20)
+        context.setLineWidth(strokeWidth)
         context.setLineCap(.round)
+        color.setStroke()
         context.strokePath()
-        self.previousPoint = point
       }
       view.layer.contents = image.cgImage
+      previousPoint = point
     default:
       return
     }
@@ -66,4 +81,5 @@ class ViewController: UIViewController {
   }
 
 }
+
 
