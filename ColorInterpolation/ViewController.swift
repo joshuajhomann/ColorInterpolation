@@ -64,7 +64,6 @@ class ViewController: UIViewController {
     let distance = hypot(point.x - previousPoint.x, point.y - previousPoint.y)
     deltaColor = CGFloat(fmod(Double(deltaColor + distance), Double(repeatLength)))
     let color = colorFor(proportion: deltaColor / repeatLength)
-    let dirtyRect = 
     let image = imageRenderer.image { imageContext in
       let context = imageContext.cgContext
       self.view.layer.render(in: context)
