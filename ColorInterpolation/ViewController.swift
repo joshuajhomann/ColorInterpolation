@@ -14,9 +14,12 @@ class ViewController: UIViewController {
   private lazy var imageRenderer: UIGraphicsImageRenderer = {
     return UIGraphicsImageRenderer(bounds: view.bounds)
   }()
+  private var views: [UIView] = []
+  private var viewIndex = 0
   private var previousPoint: CGPoint = .zero
   private var colorIndex = 0
   private var deltaColor: CGFloat = 0
+  private var timer = Timer()
 
   // MARK: - Constants
   private let repeatLength: CGFloat = 1000
@@ -25,7 +28,30 @@ class ViewController: UIViewController {
   private let colors: [UIColor] = [.cyan, .blue, .purple, .magenta, .red, .orange, .yellow]
 
   // MARK: - UIViewController
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    views = (0..<10).map { _ in UIView() }
+    views.forEach { self.view.addSubview($0) }
+  }
 
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    views.forEach { $0.frame = self.view.bounds}
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    timer.invalidate()
+    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+      UIView.animate(withDuration: 9, animations: {
+        self.views[self.viewIndex].alpha = 0
+      }, completion: { _ in
+        self.views[self.viewIndex].layer.contents = nil
+        self.views[self.viewIndex].alpha = 1
+      })
+      self.viewIndex = (self.viewIndex + 1) % self.views.count
+    }
+  }
   override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
     guard motion == .motionShake else {
       return
@@ -50,6 +76,7 @@ class ViewController: UIViewController {
     guard let touch = touches.first else {
       return
     }
+    let destinationView = views[viewIndex]
     let strokeWidth: CGFloat
     if view.traitCollection.forceTouchCapability == .available {
       strokeWidth = minimumStrokeWidth.lerp(to: maximumStrokeWidth, alpha: touch.force / touch.maximumPossibleForce)
@@ -62,7 +89,7 @@ class ViewController: UIViewController {
     let color = colorFor(proportion: deltaColor / repeatLength)
     let image = imageRenderer.image { imageContext in
       let context = imageContext.cgContext
-      self.view.layer.render(in: context)
+      destinationView.layer.render(in: context)
       let path = CGMutablePath()
       path.move(to: previousPoint)
       path.addLine(to: point)
@@ -72,7 +99,7 @@ class ViewController: UIViewController {
       color.setStroke()
       context.strokePath()
     }
-    view.layer.contents = image.cgImage
+    destinationView.layer.contents = image.cgImage
     previousPoint = point
   }
 
