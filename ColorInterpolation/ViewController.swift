@@ -11,24 +11,20 @@ import UIKit
 class ViewController: UIViewController {
 
   // MARK: - Variables
-  var imageRenderer: UIGraphicsImageRenderer!
-  var previousPoint: CGPoint = .zero
-  var colorIndex = 0
-  var deltaColor: CGFloat = 0
+  private lazy var imageRenderer: UIGraphicsImageRenderer = {
+    return UIGraphicsImageRenderer(bounds: view.bounds)
+  }()
+  private var previousPoint: CGPoint = .zero
+  private var colorIndex = 0
+  private var deltaColor: CGFloat = 0
 
   // MARK: - Constants
-  let repeatLength: CGFloat = 1000
-  let minimumStrokeWidth: CGFloat = 10
-  let maximumStrokeWidth: CGFloat = 100
-  let colors: [UIColor] = [.cyan, .blue, .purple, .magenta, .red, .orange, .yellow]
+  private let repeatLength: CGFloat = 1000
+  private let minimumStrokeWidth: CGFloat = 10
+  private let maximumStrokeWidth: CGFloat = 100
+  private let colors: [UIColor] = [.cyan, .blue, .purple, .magenta, .red, .orange, .yellow]
 
   // MARK: - UIViewController
-
-  override func viewDidLayoutSubviews() {
-    super.viewDidLayoutSubviews()
-    imageRenderer = UIGraphicsImageRenderer(bounds: view.bounds)
-    view.layer.contents = nil
-  }
 
   override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
     guard motion == .motionShake else {
