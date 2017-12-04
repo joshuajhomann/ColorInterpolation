@@ -44,13 +44,12 @@ class ViewController: UIViewController {
     super.viewDidAppear(animated)
     timer.invalidate()
     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-      UIView.animate(withDuration: 9, animations: {
+      UIView.animate(withDuration: 10) {
         self.views[self.viewIndex].alpha = 0
-      }, completion: { _ in
-        self.views[self.viewIndex].layer.contents = nil
-        self.views[self.viewIndex].alpha = 1
-      })
+      }
       self.viewIndex = (self.viewIndex + 1) % self.views.count
+      self.views[self.viewIndex].layer.contents = nil
+      self.views[self.viewIndex].alpha = 1
     }
   }
 
@@ -100,9 +99,10 @@ class ViewController: UIViewController {
       context.setLineCap(.round)
       color.setStroke()
       context.strokePath()
+      previousPoint = point
     }
     destinationView.layer.contents = image.cgImage
-    previousPoint = point
+    view.bringSubview(toFront: destinationView)
   }
 
   // MARK: Instance Methods
