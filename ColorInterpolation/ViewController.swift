@@ -31,12 +31,13 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     views = (0..<10).map { _ in UIView() }
-    views.forEach { self.view.addSubview($0) }
-  }
-
-  override func viewDidLayoutSubviews() {
-    super.viewDidLayoutSubviews()
-    views.forEach { $0.frame = self.view.bounds}
+    views.forEach { view in
+      self.view.addSubview(view)
+      view.isUserInteractionEnabled = false
+      view.translatesAutoresizingMaskIntoConstraints = false
+      let attributes: [NSLayoutAttribute] = [.top,.bottom, .leading, .trailing]
+      NSLayoutConstraint.activate( attributes.map {NSLayoutConstraint(item: view, attribute: $0, relatedBy: .equal, toItem: self.view, attribute: $0, multiplier: 1, constant: 0)})
+    }
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -52,6 +53,7 @@ class ViewController: UIViewController {
       self.viewIndex = (self.viewIndex + 1) % self.views.count
     }
   }
+
   override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
     guard motion == .motionShake else {
       return
@@ -59,7 +61,7 @@ class ViewController: UIViewController {
     UIView.animate(withDuration: 0.25, animations: {
       self.view.alpha = 0
     }, completion: { _ in
-      self.view.layer.contents = nil
+      self.views.forEach{ $0.layer.contents = nil }
       self.view.alpha = 1
     })
 
