@@ -24,15 +24,15 @@ class LineView: UIView {
 
   override func willMove(toSuperview newSuperview: UIView?) {
     super.willMove(toSuperview: newSuperview)
+    timer.invalidate()
     switch newSuperview {
     case .some(_):
       displayLink.add(to: .current, forMode: .defaultRunLoopMode)
+      timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        self.points = self.points.filter { $0.created.timeIntervalSinceNow > -10 }
+      }
     case .none:
       displayLink.remove(from: .current, forMode: .defaultRunLoopMode)
-    }
-    timer.invalidate()
-    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-      self.points = self.points.filter { $0.created.timeIntervalSinceNow > -10 }
     }
   }
   
@@ -65,22 +65,14 @@ class LineView: UIView {
   }
   
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    guard let touch = touches.first,
-      let previousPoint = points.last?.coordinate else {
+    guard let touch = touches.first else {
         return
     }
-    let strokeWidth: CGFloat
-    if traitCollection.forceTouchCapability == .available {
-      strokeWidth = minimumStrokeWidth.lerp(to: maximumStrokeWidth, alpha: touch.force / touch.maximumPossibleForce)
+    if let coalesced = event?.coalescedTouches(for: touch) {
+      coalesced.forEach { self.add(touch: $0) }
     } else {
-      strokeWidth = minimumStrokeWidth * 2
+      add(touch: touch)
     }
-    let point = touch.location(in: self)
-    let distance = hypot(point.x - previousPoint.x, point.y - previousPoint.y)
-    deltaColor = CGFloat(fmod(Double(deltaColor + distance), Double(repeatLength)))
-    points.append(ColorPoint(coordinate: point,
-                             color: colorFor(proportion: deltaColor / repeatLength),
-                             strokeWidth: strokeWidth))
   }
   
   override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
@@ -99,6 +91,24 @@ class LineView: UIView {
   }
   
   // MARK: Instance Methods
+  private func add(touch: UITouch) {
+    guard let previousPoint = points.last?.coordinate else {
+      return
+    }
+    let strokeWidth: CGFloat
+    if touch.force > 0 {
+      strokeWidth = minimumStrokeWidth.lerp(to: maximumStrokeWidth, alpha: touch.force / touch.maximumPossibleForce)
+    } else {
+      strokeWidth = minimumStrokeWidth * 2
+    }
+    let point = touch.location(in: self)
+    let distance = hypot(point.x - previousPoint.x, point.y - previousPoint.y)
+    deltaColor = CGFloat(fmod(Double(deltaColor + distance), Double(repeatLength)))
+    points.append(ColorPoint(coordinate: point,
+                             color: colorFor(proportion: deltaColor / repeatLength),
+                             strokeWidth: strokeWidth))
+  }
+
   private func colorFor(proportion: CGFloat) -> UIColor {
     let count = CGFloat(colors.count)
     let lowerIndex = Int(proportion * count)
