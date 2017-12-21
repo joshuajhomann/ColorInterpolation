@@ -16,6 +16,8 @@
 		035DB8781FD4263B00B44061 /* ColorInterpolationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DB8771FD4263B00B44061 /* ColorInterpolationUITests.swift */; };
 		035DB8861FD4269100B44061 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DB8851FD4269100B44061 /* UIColorExtension.swift */; };
 		035DB8881FD426A200B44061 /* CGFloatExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DB8871FD426A200B44061 /* CGFloatExtension.swift */; };
+		4DF0C5FF1FE79AFF00AA1FE0 /* ColorPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5FE1FE79AFF00AA1FE0 /* ColorPoint.swift */; };
+		4DF0C6011FE7A7A200AA1FE0 /* LineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C6001FE7A7A200AA1FE0 /* LineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		035DB8791FD4263B00B44061 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		035DB8851FD4269100B44061 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		035DB8871FD426A200B44061 /* CGFloatExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloatExtension.swift; sourceTree = "<group>"; };
+		4DF0C5FE1FE79AFF00AA1FE0 /* ColorPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPoint.swift; sourceTree = "<group>"; };
+		4DF0C6001FE7A7A200AA1FE0 /* LineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,10 +109,12 @@
 				035DB8851FD4269100B44061 /* UIColorExtension.swift */,
 				035DB8871FD426A200B44061 /* CGFloatExtension.swift */,
 				035DB8591FD4263B00B44061 /* ViewController.swift */,
+				4DF0C6001FE7A7A200AA1FE0 /* LineView.swift */,
 				035DB85B1FD4263B00B44061 /* Main.storyboard */,
 				035DB85E1FD4263B00B44061 /* Assets.xcassets */,
 				035DB8601FD4263B00B44061 /* LaunchScreen.storyboard */,
 				035DB8631FD4263B00B44061 /* Info.plist */,
+				4DF0C5FE1FE79AFF00AA1FE0 /* ColorPoint.swift */,
 			);
 			path = ColorInterpolation;
 			sourceTree = "<group>";
@@ -266,6 +272,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				035DB85A1FD4263B00B44061 /* ViewController.swift in Sources */,
+				4DF0C6011FE7A7A200AA1FE0 /* LineView.swift in Sources */,
+				4DF0C5FF1FE79AFF00AA1FE0 /* ColorPoint.swift in Sources */,
 				035DB8581FD4263B00B44061 /* AppDelegate.swift in Sources */,
 				035DB8881FD426A200B44061 /* CGFloatExtension.swift in Sources */,
 				035DB8861FD4269100B44061 /* UIColorExtension.swift in Sources */,
