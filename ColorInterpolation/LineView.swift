@@ -31,7 +31,11 @@ class LineView: UIView {
       path.lineWidth = point.strokeWidth
       path.lineCapStyle = .round
       let alpha = CGFloat(max(point.created.timeIntervalSinceNow + 10, 0) / 10)
-      point.color.withAlphaComponent(alpha).setStroke()
+      if point.color == .clear {
+        UIColor.clear.setStroke()
+      } else {
+        point.color.withAlphaComponent(alpha).setStroke()
+      }
       path.stroke()
       origin = point.coordinate
     }
